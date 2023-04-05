@@ -1,0 +1,12 @@
+package com.iuvity.dao;
+
+import java.util.List;
+
+import org.springframework.data.repository.CrudRepository;
+
+import com.iuvity.domain.Proveedor;
+
+public interface IProveedorDAO extends CrudRepository<Proveedor, Integer> {
+
+	Proveedor findByNit(String nit);
+}

@@ -1,0 +1,13 @@
+package com.iuvity.service;
+
+import org.springframework.http.ResponseEntity;
+
+import com.iuvity.payload.LoginRequest;
+import com.iuvity.payload.RequestRegistrar;
+
+public interface ILoginService {
+	ResponseEntity<?> login(LoginRequest loginRequest);
+
+	ResponseEntity<?> registrarUsuario(RequestRegistrar sr);
+
+}

@@ -1,0 +1,36 @@
+package com.iuvity.service;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+
+import com.iuvity.payload.RequestRegistrar;
+
+class LoginServiceTest {
+	
+	@Autowired
+	IAdminService ias;
+
+	@Test
+	void testLogin() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testRegistrarUsuario() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testValidarToken() {
+		Map<String, Boolean> resp = new HashMap<String, Boolean>();
+		resp.put("Validado", true);
+		assertNotNull(ResponseEntity.ok(resp));
+	}
+
+}

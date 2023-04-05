@@ -1,0 +1,38 @@
+package com.iuvity.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import com.iuvity.dao.IAdminDAO;
+import com.iuvity.domain.Admin;
+import com.iuvity.payload.LoginRequest;
+
+@Service
+public class AdminService implements IAdminService {
+
+	@Autowired
+	private IAdminDAO dao;
+	
+	@Override
+	public Admin consultarAdminPorUsuario(String usuario) {
+		return dao.findByUsuario(usuario);
+	}
+
+	@Override
+	public Admin consultarAdminPorCedulaYUsuario(Integer cedula, String usuario) {
+		return dao.findByCedulaAndUsuario(cedula, usuario);
+	}
+
+	@Override
+	public Admin guardarAdmin(Admin admin) {
+		return dao.save(admin);
+	}
+
+	@Override
+	public ResponseEntity<?> loginAdmin(LoginRequest loginRequest) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

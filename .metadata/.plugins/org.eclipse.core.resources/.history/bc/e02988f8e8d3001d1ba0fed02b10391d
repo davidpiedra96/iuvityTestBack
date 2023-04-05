@@ -1,0 +1,47 @@
+package com.iuvity.service;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import com.iuvity.dao.IAdminDAO;
+import com.iuvity.domain.Admin;
+
+@DataJpaTest
+public class AdminService {
+	
+	@Autowired
+	private IAdminDAO dao;
+	
+	Admin admin = new Admin(1053852663,"David Piedrahita","davipigi",new BCryptPasswordEncoder().encode("admin"));
+	@Test
+	/**
+	 * Test para revisar el guardado de Admin
+	 */
+	public void guardarAdminTest() {
+		
+		Admin adminTest = dao.save(admin);
+		System.out.println("*********************");
+		System.out.println(adminTest.toString());
+		System.out.println("*********************");
+		assertNotNull(adminTest);
+	}
+	
+	
+
+	@Test
+	public void consultarAdminPorCedulaYUsuarioTest() {
+		Admin adminTest = dao.save(admin);
+		Admin consultaAdmin = dao.findByCedulaAndUsuario(adminTest.getCedula(),adminTest.getUsuario());
+		
+		System.out.println("*********************");
+		System.out.println(consultaAdmin.toString());
+		System.out.println("*********************");
+		assertNotNull(consultaAdmin);
+	}
+}

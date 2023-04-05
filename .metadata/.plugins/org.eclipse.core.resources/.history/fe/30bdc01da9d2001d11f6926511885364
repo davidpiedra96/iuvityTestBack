@@ -1,0 +1,15 @@
+package com.iuvity.domain;
+
+import java.io.Serializable;
+
+public class RequestListarProductos extends Producto implements Serializable {
+
+	/**
+	 * serialVersionUID
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	// Atributos
+	private Float vlr_unitario;
+	private Float saldo_cant;
+}

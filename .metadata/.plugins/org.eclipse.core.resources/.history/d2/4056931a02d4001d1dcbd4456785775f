@@ -1,0 +1,44 @@
+package com.iuvity.service;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import com.iuvity.dao.IProductoDAO;
+import com.iuvity.domain.Producto;
+import com.iuvity.domain.ResponseListarProductos;
+
+@SpringBootTest
+class ProductoServiceTest {
+	
+	@Autowired
+	private IProductoDAO ipd;
+
+	@Test
+	void testListarProductos() {
+		construirData();
+		List<ResponseListarProductos> lProducto = ipd.buscarProductos();
+		assertNotNull(lProducto);
+		assertEquals(5, lProducto.size());
+	}
+
+	@Test
+	void testBuscarProducto() {
+		fail("Not yet implemented");
+	}
+	
+	void construirData() {
+		Producto producto1 = new Producto("item1","ref1","unidades");
+		Producto producto2 = new Producto("item2","ref2","unidades");
+		Producto producto3 = new Producto("item3","ref3","unidades");
+		Producto producto4 = new Producto("item4","ref4","unidades");
+		Producto producto5 = new Producto("item5","ref5","unidades");
+
+	}
+
+}

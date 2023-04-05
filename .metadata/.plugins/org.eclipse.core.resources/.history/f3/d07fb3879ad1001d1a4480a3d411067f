@@ -1,0 +1,29 @@
+package com.iuvity.domain;
+
+import java.util.HashSet;
+import java.util.Set;
+
+public class AdminConfiguration extends Admin{
+
+	private Set<Rol> roles = new HashSet<>();
+
+	public AdminConfiguration(Integer cedula, String nombre, String usuario, String password, Set<Rol> roles) {
+		super(cedula, nombre, usuario, password);
+		this.roles = roles;
+	}
+
+	public AdminConfiguration(Integer cedula, String nombre, String usuario, String password) {
+		super(cedula, nombre, usuario, password);
+	}
+
+	// Getters y Setters
+	public Set<Rol> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Set<Rol> roles) {
+		this.roles = roles;
+	}
+	
+	
+}

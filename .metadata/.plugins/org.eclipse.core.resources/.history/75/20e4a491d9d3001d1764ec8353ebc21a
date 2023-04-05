@@ -1,0 +1,78 @@
+package com.iuvity.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.iuvity.payload.JwtResponse;
+import com.iuvity.payload.LoginRequest;
+import com.iuvity.payload.MessageResponse;
+import com.iuvity.payload.RequestRegistrar;
+import com.iuvity.security.jwt.JwtUtils;
+import com.iuvity.security.service.UserDetailsImpl;
+import com.iuvity.service.IAdminService;
+
+import org.springframework.http.ResponseEntity;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.rmi.UnexpectedException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
+import com.iuvity.domain.Admin;
+
+@RestController
+@RequestMapping("/Admin")
+@CrossOrigin(origins = "http://localhost:4200", methods = { RequestMethod.GET, RequestMethod.POST },
+	allowedHeaders = {}, maxAge = 3600)
+public class AdminController {
+
+	@Autowired
+	IAdminService ias;
+
+
+	
+	@CrossOrigin
+	@GetMapping("/validarToken")
+	public ResponseEntity<?> validarToken(){
+		Map<String, Boolean> resp = new HashMap<String, Boolean>();
+		resp.put("Validado", true);
+		return ResponseEntity.ok(resp);
+	}
+
+	/**
+	 * Servicio para el logueo de administradores.
+	 * 
+	 * @param loginRequest
+	 * @return Json con token y datos de usuario.
+	 */
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+		return ias.loginAdmin(loginRequest);
+	}
+
+	/**
+	 * Servicio para registrar un admin
+	 * @param request
+	 * @return
+	 * @throws UnexpectedException
+	 */
+	@PostMapping("/registrar")
+	public ResponseEntity<?> registrarAdmin(@Valid @RequestBody RequestRegistrar request) throws UnexpectedException {
+		return ias.registrarAdmin(request);
+	}
+}

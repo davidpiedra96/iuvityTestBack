@@ -1,0 +1,18 @@
+package com.iuvity.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.iuvity.dao.IProveedorDAO;
+import com.iuvity.domain.Proveedor;
+
+public class ProveedorService implements IProveedorService{
+	
+	@Autowired
+	private IProveedorDAO ipd;
+
+	@Override
+	public Proveedor obtenerProveedorPorNit(String nit) {
+		return null;
+	}
+
+}

@@ -1,0 +1,29 @@
+package com.iuvity.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import com.iuvity.payload.LoginRequest;
+import com.iuvity.payload.RequestRegistrar;
+
+@Service
+public class LoginService implements ILoginService{
+	
+	@Autowired
+	IAdminService ias;
+
+
+	@Override
+	public ResponseEntity<?> login(LoginRequest loginRequest) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseEntity<?> registrarUsuario(RequestRegistrar sr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

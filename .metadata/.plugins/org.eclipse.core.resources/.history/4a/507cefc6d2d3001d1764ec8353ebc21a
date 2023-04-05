@@ -1,0 +1,22 @@
+package com.iuvity.service;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+import com.iuvity.dao.IAdminDAO;
+import com.iuvity.domain.Admin;
+
+@DataJpaTest
+public class AdminService {
+	
+	@Autowired
+	private IAdminDAO dao;
+	
+	@Test
+	public void testConsultarAdminPorUsuario() {
+		String usuario = "davipigi";
+		Admin adm = dao.findByUsuario(usuario);
+	}
+
+}

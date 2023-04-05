@@ -1,0 +1,8 @@
+package com.iuvity.service;
+
+import com.iuvity.domain.Proveedor;
+
+public interface IProveedorService {
+
+	Proveedor obtenerProveedorPorNit(String nit);
+}

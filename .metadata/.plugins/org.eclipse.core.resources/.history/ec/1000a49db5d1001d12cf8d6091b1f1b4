@@ -1,0 +1,70 @@
+package com.iuvity.payload;
+
+
+import java.util.List;
+
+public class JwtResponse {
+	private String token;
+	private String type = "Bearer";
+	private Integer cedula;
+	private String usuario;
+	private String email;
+	private List<String> roles;
+
+	public JwtResponse(String accessToken, Integer cedula, String usuario, String email, List<String> roles) {
+		this.token = accessToken;
+		this.cedula = cedula;
+		this.usuario = usuario;
+		this.email = email;
+		this.roles = roles;
+	}
+
+	public synchronized String getToken() {
+		return token;
+	}
+
+	public synchronized void setToken(String token) {
+		this.token = token;
+	}
+
+	public synchronized String getType() {
+		return type;
+	}
+
+	public synchronized void setType(String type) {
+		this.type = type;
+	}
+
+	public synchronized Integer getCedula() {
+		return cedula;
+	}
+
+	public synchronized void setCedula(Integer cedula) {
+		this.cedula = cedula;
+	}
+
+	public synchronized String getUsuario() {
+		return usuario;
+	}
+
+	public synchronized void setUsuario(String usuario) {
+		this.usuario = usuario;
+	}
+
+	public synchronized String getEmail() {
+		return email;
+	}
+
+	public synchronized void setEmail(String email) {
+		this.email = email;
+	}
+
+	public synchronized List<String> getRoles() {
+		return roles;
+	}
+
+	public synchronized void setRoles(List<String> roles) {
+		this.roles = roles;
+	}
+
+	}

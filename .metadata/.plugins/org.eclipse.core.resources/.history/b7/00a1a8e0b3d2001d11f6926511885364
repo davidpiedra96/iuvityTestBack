@@ -1,0 +1,54 @@
+package com.iuvity.payload;
+
+public class ConsultarKardexProductoRequest {
+	
+	// Atributos
+	private Integer mes;
+	private Integer anio;
+	private Integer codigo_producto;
+	
+	
+	// Constructores
+	/**
+	 * Constructor vacio
+	 */
+	public ConsultarKardexProductoRequest() {
+		super();
+	}
+
+	/**
+	 * Constructor con todos los campos
+	 * @param mes
+	 * @param anio
+	 * @param codigo_producto
+	 */
+	public ConsultarKardexProductoRequest(Integer mes, Integer anio, Integer codigo_producto) {
+		super();
+		this.mes = mes;
+		this.anio = anio;
+		this.codigo_producto = codigo_producto;
+	}
+	
+	
+	public Integer getMes() {
+		return mes;
+	}
+	public void setMes(Integer mes) {
+		this.mes = mes;
+	}
+	public Integer getAnio() {
+		return anio;
+	}
+	public void setAnio(Integer anio) {
+		this.anio = anio;
+	}
+	public Integer getCodigo_producto() {
+		return codigo_producto;
+	}
+	public void setCodigo_producto(Integer codigo_producto) {
+		this.codigo_producto = codigo_producto;
+	}
+	
+	
+
+}

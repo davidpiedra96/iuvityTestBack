@@ -1,0 +1,335 @@
+package com.iuvity.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.iuvity.constants.Constants;
+import com.iuvity.dao.IFactura_CompraDAO;
+import com.iuvity.dao.IFactura_VentaDAO;
+import com.iuvity.dao.IKardexDAO;
+import com.iuvity.dao.IProductoDAO;
+import com.iuvity.dao.IProducto_Factura_CompraDAO;
+import com.iuvity.domain.Factura_Compra;
+import com.iuvity.domain.Factura_Venta;
+import com.iuvity.domain.Kardex;
+import com.iuvity.domain.Producto;
+import com.iuvity.domain.Producto_Factura_Compra;
+import com.iuvity.payload.RequestCreacionStock;
+import com.iuvity.payload.RequestDevolucionCompraProducto;
+import com.iuvity.payload.RequestDevolucionVentaProducto;
+import com.iuvity.payload.RequestIngresoProducto;
+import com.iuvity.payload.RequestVentaProducto;
+import com.iuvity.util.Util;
+
+@Service
+public class KardexService implements IKardexService {
+
+	@Autowired
+	private IFactura_CompraDAO ifc;
+
+	@Autowired
+	private IFactura_VentaDAO ifv;
+
+	@Autowired
+	private IKardexDAO ik;
+
+	@Autowired
+	private IProducto_Factura_CompraDAO ipfc;
+
+	@Autowired
+	private IProductoDAO ipd;
+
+	@Override
+	public String ingresarProductoNuevo(RequestCreacionStock rcs) {
+		String resp = "";
+		if (!(new Util().validarRequestCreacionStock(rcs))) {
+			float valorUnitario = 0;
+			resp = "No es posible ingresar el producto en este momento, valide con el administrador del sistema";
+			try {
+				// 1. Se almacena el producto nuevo
+				Producto producto = new Producto(rcs.getNombre(), rcs.getReferencia(), rcs.getUnidad());
+				producto = ipd.save(producto);
+
+				if (!new Util().esMenorACeroONull(producto.getCodigo())) {
+					// 2. Se almacena la factura de compra
+					Factura_Compra compra = new Factura_Compra(rcs.getCodigo_proveedor(), rcs.getFecha_factura());
+					compra = ifc.save(compra);
+
+					if (!new Util().esMenorACeroONull(compra.getCodigo())) {
+						Producto_Factura_Compra pfc = new Producto_Factura_Compra(producto.getCodigo(),
+								compra.getCodigo(), rcs.getValor_total(), rcs.getCantidad());
+						pfc = ipfc.save(pfc);
+
+						if (!new Util().esMenorACeroONull(pfc.getCodigo())) {
+							// 3. Se crea Kardex para el producto nuevo
+							valorUnitario = rcs.getValor_total() / rcs.getCantidad();
+
+							Kardex kardex = new Kardex(producto.getCodigo(), rcs.getFecha_factura(),
+									rcs.getDescripcion(), valorUnitario, rcs.getCantidad().floatValue(),
+									rcs.getValor_total(), (float) 0, (float) 0, rcs.getCantidad().floatValue(),
+									rcs.getValor_total(), null, compra.getCodigo());
+
+							kardex = ik.save(kardex);
+							if (!new Util().esMenorACeroONull(kardex.getIndice())) {
+								resp = "Producto almacenado correctamente";
+							} else {
+								ipd.deleteById(producto.getCodigo());
+								ifc.deleteById(compra.getCodigo());
+								ipfc.deleteById(pfc.getCodigo());
+							}
+						} else {
+							ipd.deleteById(producto.getCodigo());
+							ifc.deleteById(compra.getCodigo());
+						}
+					} else {
+						ipd.deleteById(producto.getCodigo());
+					}
+				}
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		} else {
+			resp = Constants.DATOS_INGRESADOS_ERRONEOS;
+		}
+		return resp;
+	}
+
+	@Override
+	public String ingresarCompraProducto(RequestIngresoProducto rip) {
+		String resp = "";
+		if (!new Util().validarRequestIngresoProducto(rip)) {
+			try {
+				resp = "No es posible ingresar la compra en este momento, valide con el administrador del sistema";
+				// 1. Se consulta el kardex del producto
+				List<Kardex> lKardexs = ik.findByCodigoProducto(rip.getCodigo_producto());
+				if (lKardexs.size() > 0) {
+					// 2. Se obtiene el ultimo registro
+					Kardex item = lKardexs.get(lKardexs.size() - 1);
+
+					// 3. Se calcula el valor unitario
+					Float entradaValorUnitario = rip.getEntrada_valor() / rip.getEntrada_cant();
+					Float valor2 = rip.getEntrada_cant() * entradaValorUnitario;
+					Float cantidadTotal = item.getSaldo_cant() + rip.getEntrada_cant();
+					Float valorUnitario = (item.getSaldo_valor() + valor2) / (cantidadTotal);
+
+					// 4. Se calculo Saldo_cant nuevo y saldo_valor nuevo
+					Float saldo_cant = rip.getEntrada_cant() + item.getSaldo_cant();
+					Float saldo_valor = valorUnitario * saldo_cant;
+
+					// 5. Se registra la factura
+					Factura_Compra compra = new Factura_Compra(rip.getCodigo_proveedor(), rip.getFecha());
+					compra = ifc.save(compra);
+
+					if (!new Util().esMenorACeroONull(compra.getCodigo())) {
+						Producto_Factura_Compra pfc = new Producto_Factura_Compra(rip.getCodigo_producto(),
+								compra.getCodigo(), rip.getEntrada_valor(), rip.getEntrada_cant());
+						pfc = ipfc.save(pfc);
+
+						if (!new Util().esMenorACeroONull(pfc.getCodigo())) {
+							// 6. Se registra compra en el kardex
+							Kardex kardex = new Kardex(rip.getCodigo_producto(), rip.getFecha(), rip.getDescripcion(),
+									valorUnitario, rip.getEntrada_cant(), rip.getEntrada_valor(), (float) 0, (float) 0,
+									saldo_cant, saldo_valor, null, compra.getCodigo());
+
+							kardex = ik.save(kardex);
+							if (!new Util().esMenorACeroONull(kardex.getIndice())) {
+								resp = "Los datos de la compra se han ingresado satisfactoriamente al Kardex";
+							} else {
+								ifc.deleteById(compra.getCodigo());
+								ipfc.deleteById(pfc.getCodigo());
+							}
+						} else {
+							ifc.deleteById(compra.getCodigo());
+						}
+					}
+				} else {
+					resp = "No se encontro el producto en el inventario";
+				}
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+				resp = "No es posible realizar la transacción solicitada, contacte al administrador del sistema";
+			}
+		} else {
+			resp = Constants.DATOS_INGRESADOS_ERRONEOS;
+		}
+
+		return resp;
+	}
+
+	@Override
+	public String ingresarVentaProducto(RequestVentaProducto rvp) {
+		String response = "";
+		Float salida_valor = (float) 0;
+		Float saldo_cant = (float) 0;
+		Float saldo_valor = (float) 0;
+		Util u = new Util();
+		response = "No es posible ingresar venta de producto en este momento, contacte con el administrador";
+		if (!new Util().validarRequestVentaProducto(rvp)) {
+			try {
+				response = "";
+				// 1. Se consulta el kardex del producto
+				List<Kardex> lKardexs = ik.findByCodigoProducto(rvp.getCodigo_producto());
+
+				if (lKardexs.size() > 0) {
+					// 2. Se obtiene el ultimo registro
+					Kardex item = lKardexs.get(lKardexs.size() - 1);
+
+					if (rvp.getSalida_cant() <= item.getSaldo_cant()) {
+						// 3. Se genera factura de venta
+						String tipo_tarjeta = u.getAES(rvp.getTipo_tarjeta());
+						tipo_tarjeta = u.cifrarBase64(tipo_tarjeta);
+						
+						String numero_tarjeta = u.getAES(rvp.getNumero_tarjeta());
+						numero_tarjeta = u.cifrarBase64(numero_tarjeta);
+						
+						String nombre_titular = u.getAES(rvp.getNombre_titular());
+						nombre_titular = u.cifrarBase64(nombre_titular);
+						
+						
+						Factura_Venta venta = new Factura_Venta(rvp.getCodigo_cliente(), rvp.getFecha(),
+								tipo_tarjeta, numero_tarjeta, nombre_titular);
+						venta = ifv.save(venta);
+
+						if (!new Util().esMenorACeroONull(venta.getCodigo())) {
+							// 4.Se calculan variables
+							salida_valor = item.getVlr_unitario() * rvp.getSalida_cant();
+							saldo_cant = item.getSaldo_cant() - rvp.getSalida_cant();
+							saldo_valor = saldo_cant * item.getVlr_unitario();
+
+							// 5. Se registra venta en Kardex
+							Kardex kardex = new Kardex(rvp.getCodigo_producto(), rvp.getFecha(), rvp.getDescripcion(),
+									item.getVlr_unitario(), (float) 0, (float) 0, rvp.getSalida_cant(), salida_valor,
+									saldo_cant, saldo_valor, venta.getCodigo(), null);
+
+							kardex = ik.save(kardex);
+							if (!new Util().esMenorACeroONull(kardex.getIndice())) {
+								response = "Venta realizada satisfactoriamente";
+							} else {
+								ifc.deleteById(venta.getCodigo());
+							}
+						}
+					} else {
+						response = "No hay Stock disponible para la venta, stock disponible: " + item.getSaldo_cant();
+					}
+				}
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		} else {
+			response = Constants.DATOS_INGRESADOS_ERRONEOS;
+		}
+
+		return response;
+	}
+
+	@Override
+	public String devolucionCompraProducto(RequestDevolucionCompraProducto rdcp) {
+		Float entrada_valor = (float) 0;
+		Float entrada_cant = -rdcp.getEntrada_cant();
+		Float vlr_unitario = (float) 0;
+		Float saldo_cant = (float) 0;
+		Float saldo_valor = (float) 0;
+		String response = "No es posible realizar la devolución de compra en este momento, contacte con el administrador del sistema";
+
+		if (!new Util().validarRequestDevolucionCompraProducto(rdcp)) {
+			try {
+				// 1. Se consulta el kardex del producto
+				List<Kardex> lKardexs = ik.findByCodigoProducto(rdcp.getCodigo_producto());
+
+				if (lKardexs.size() > 0) {
+					// 2. Se obtiene el ultimo registro
+					Kardex item = lKardexs.get(lKardexs.size() - 1);
+					// 3. Se obtiene el valor de entrada_valor
+					entrada_valor = entrada_cant * (rdcp.getValor_compra() / rdcp.getEntrada_cant());
+					// 4. Se calcula el valor unitario
+					vlr_unitario = (item.getSaldo_valor() + entrada_valor) / (item.getSaldo_cant() + entrada_cant);
+					// 5. Se calcula el saldo_cant nuevo y saldo_valor nuevo
+					saldo_cant = item.getSaldo_cant() + entrada_cant;
+					saldo_valor = saldo_cant * vlr_unitario;
+					// 6. Se ingresa devolución al Kardex
+					Kardex kardex = new Kardex(rdcp.getCodigo_producto(), rdcp.getFecha(), rdcp.getDescripcion(),
+							vlr_unitario, entrada_cant, entrada_valor, (float) 0, (float) 0, saldo_cant, saldo_valor,
+							null, rdcp.getCodigo_factura_compra());
+
+					kardex = ik.save(kardex);
+					if (!new Util().esMenorACeroONull(kardex.getIndice())) {
+						response = "Devoluciṕn realizada con exito";
+					}
+				}
+
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		} else {
+			response = Constants.DATOS_INGRESADOS_ERRONEOS;
+		}
+
+		return response;
+	}
+
+	@Override
+	public String devolucionVentaProducto(RequestDevolucionVentaProducto rdvp) {
+		Float vlr_unitario_fac = (float) 0;
+		Float salida_valor = (float) 0;
+		Float vlr_unitario = (float) 0;
+		Float saldo_cant = (float) 0;
+		Float saldo_valor = (float) 0;
+		String response = "";
+
+		if (!new Util().validarRequestDevolucionVentaProducto(rdvp)) {
+			try {
+				// 1. Se consulta el kardex del producto
+				List<Kardex> lKardexs = ik.findByCodigoProducto(rdvp.getCodigo_producto());
+
+				if (lKardexs.size() > 0) {
+					// 2. Se obtiene el ultimo registro
+					Kardex item = lKardexs.get(lKardexs.size() - 1);
+					// 3. Se obtiene el valor unitario de la factura de venta del producto
+					List<Kardex> lKardexFactVenta = ik.findByCodigoProductoAndCodigoFactura(rdvp.getCodigo_producto(),
+							rdvp.getCodigo_factura_venta());
+
+					if (lKardexFactVenta.size() > 0) {
+						Kardex item2 = lKardexFactVenta.get(lKardexFactVenta.size() - 1);
+						vlr_unitario_fac = item2.getVlr_unitario();
+						// 4. Se calcula salida_valor
+						salida_valor = rdvp.getSalida_cant() * vlr_unitario_fac;
+						// 5. Se calcula el nuevo valor unitario
+						vlr_unitario = (item.getSaldo_valor() + salida_valor)
+								/ (item.getSaldo_cant() + rdvp.getSalida_cant());
+						// 6. Se calcula saldo_cant
+						saldo_cant = item.getSaldo_cant() + rdvp.getSalida_cant();
+						// 7. Se calcula saldo_valor
+						saldo_valor = saldo_cant * vlr_unitario;
+						// 8. Se almacena registro en el Kardex
+						Kardex kardex = new Kardex(rdvp.getCodigo_producto(), rdvp.getFecha(), rdvp.getDescripcion(),
+								vlr_unitario, (float) 0, (float) 0, rdvp.getSalida_cant(), salida_valor, saldo_cant,
+								saldo_valor, rdvp.getCodigo_factura_venta(), null);
+
+						kardex = ik.save(kardex);
+						if (!new Util().esMenorACeroONull(kardex.getIndice())) {
+							response = "La devolución de la venta se ha realizado con exito";
+						}
+					}
+
+				} else {
+					response = "No existe factura de venta para esta devolución";
+				}
+
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		} else {
+			response = Constants.DATOS_INGRESADOS_ERRONEOS;
+		}
+
+		return response;
+	}
+
+	@Override
+	public List<Kardex> consultaKardexMesAnio(Integer mes, Integer anio, Integer codigo_producto) {
+		return ik.findKardexMesAnio(mes, anio, codigo_producto);
+	}
+
+}

@@ -1,0 +1,31 @@
+package com.iuvity.service;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+@DataJpaTest
+class AdminServiceTest {
+
+	@Autowired
+	private IAdminDAO dao;
+	
+	Admin admin = new Admin(1053852663,"David Piedrahita","davipigi",new BCryptPasswordEncoder().encode("admin"));
+	
+	@Test
+	void testConsultarAdminPorUsuario() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testConsultarAdminPorCedulaYUsuario() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testGuardarAdmin() {
+		fail("Not yet implemented");
+	}
+
+}

@@ -1,0 +1,33 @@
+package com.iuvity.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.iuvity.dao.IAdminDAO;
+
+@RestController
+@RequestMapping("/admin")
+@CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST }, maxAge = 3600)
+public class AdminController {
+	
+	@Autowired
+	IAdminDAO dao;
+	
+	@GetMapping()
+	public String prueba() {
+		AdminController admin = new AdminController();
+		try {
+		admin = dao.findByUsuario("davipigi");
+		
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+		
+		return admin.toString();
+	}
+
+}

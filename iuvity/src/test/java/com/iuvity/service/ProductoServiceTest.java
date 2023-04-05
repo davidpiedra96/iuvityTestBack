@@ -1,0 +1,106 @@
+package com.iuvity.service;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import com.iuvity.dao.IProductoDAO;
+import com.iuvity.dao.IProveedorDAO;
+import com.iuvity.domain.Producto;
+import com.iuvity.domain.Proveedor;
+import com.iuvity.payload.RequestCreacionStock;
+import com.iuvity.payload.ResponseListarProductos;
+
+@SpringBootTest
+class ProductoServiceTest {
+
+	@Autowired
+	private IProductoDAO ipd;
+	
+	@Autowired
+	private IProveedorDAO provDao;
+
+	@Autowired
+	private IKardexService iks;
+
+	/**
+	 * Test del servicio de listarProductos
+	 */
+	@Test
+	void testListarProductos() {
+		construirData();
+		List<ResponseListarProductos> lProducto = ipd.buscarProductos();
+		assertNotNull(lProducto);
+	}
+
+	/**
+	 * Test del servicio BuscarProducto
+	 */
+	@Test
+	void testBuscarProducto() {
+		construirData();
+		assertNotNull(ipd.buscarProducto(1));
+	}
+
+	/**
+	 * Método que construye la data para las pruebas
+	 */
+	void construirData() {
+		Proveedor prov = new Proveedor(1,"12345","carrera 18","Juliana Meza");
+		prov = provDao.save(prov);
+		
+		
+		Producto producto1 = new Producto("item1","ref1","unidades");
+		Producto producto2 = new Producto("item2","ref2","unidades");
+		Producto producto3 = new Producto("item3","ref3","unidades");
+
+		RequestCreacionStock request1 = new RequestCreacionStock(
+				producto1.getNombre(),
+				producto2.getReferencia(), 
+				producto1.getUnidad(), 
+				1, 
+				"05/04/2023", 
+				(float) 100000, 
+				2, 
+				"Producto1", 
+				2023, 
+				"categoriatest", 
+				"tipotest");
+		
+		RequestCreacionStock request2 = new RequestCreacionStock(
+				producto2.getNombre(),
+				producto2.getReferencia(), 
+				producto2.getUnidad(), 
+				1, 
+				"05/04/2023", 
+				(float) 100000, 
+				2, 
+				"Producto2", 
+				2023, 
+				"categoriatest", 
+				"tipotest");
+		
+		RequestCreacionStock request3 = new RequestCreacionStock(
+				producto3.getNombre(),
+				producto3.getReferencia(), 
+				producto3.getUnidad(), 
+				1, 
+				"05/04/2023", 
+				(float) 100000, 
+				2, 
+				"Producto3", 
+				2023, 
+				"categoriatest", 
+				"tipotest");
+		
+		iks.ingresarProductoNuevo(request1);
+		iks.ingresarProductoNuevo(request2);
+		iks.ingresarProductoNuevo(request3);
+	}
+
+}

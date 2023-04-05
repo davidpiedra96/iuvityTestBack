@@ -1,0 +1,9 @@
+package com.iuvity.service;
+
+import com.iuvity.domain.Admin;
+
+public interface IAdminService {
+
+	Admin consultarAdminPorUsuario(String usuario);
+	Admin consultarAdminPorCedulaYUsuario(Integer cedula, String usuario);
+}

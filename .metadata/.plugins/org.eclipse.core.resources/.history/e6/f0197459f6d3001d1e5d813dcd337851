@@ -1,0 +1,71 @@
+package com.iuvity.service;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import com.iuvity.controller.AdminController;
+import com.iuvity.dao.IAdminDAO;
+import com.iuvity.domain.Admin;
+import com.iuvity.payload.JwtResponse;
+import com.iuvity.payload.LoginRequest;
+import com.iuvity.payload.MessageResponse;
+import com.iuvity.security.jwt.JwtUtils;
+import com.iuvity.security.service.UserDetailsImpl;
+
+//@DataJpaTest
+@WebMvcTest(AdminController.class)
+class LoginServiceTest {
+	
+	@Autowired
+	private IAdminDAO dao;
+	
+	@Autowired
+	AuthenticationManager authenticationManager;
+	
+	Admin admin = new Admin(1053852663,"David Piedrahita","davipigi",new BCryptPasswordEncoder().encode("admin"));
+
+	@Test
+	void testLogin() {
+		assertNotNull(dao.save(admin));
+		
+		LoginRequest loginRequest = new LoginRequest(admin.getUsuario(), admin.getPassword());
+		assertNotNull(loginRequest);
+		
+		Authentication authentication = authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+	}
+
+	@Test
+	void testRegistrarUsuario() {
+		Admin adminConsulta = dao.findByCedulaAndUsuario(admin.getCedula(), admin.getUsuario());
+		//assertNull(adminConsulta);
+		if (adminConsulta == null) {
+			adminConsulta = dao.save(admin);
+			assertNotNull(adminConsulta);
+		}
+		assertNotNull(ResponseEntity.ok(new MessageResponse("Usuario registrado con éxito")));
+	}
+
+	@Test
+	void testValidarToken() {
+		Map<String, Boolean> resp = new HashMap<String, Boolean>();
+		resp.put("Validado", true);
+		assertNotNull(ResponseEntity.ok(resp));
+	}
+
+}

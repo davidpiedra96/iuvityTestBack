@@ -1,0 +1,19 @@
+package com.iuvity.service;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+class ProductoServiceTest {
+
+	@Test
+	void testListarProductos() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testBuscarProducto() {
+		fail("Not yet implemented");
+	}
+
+}

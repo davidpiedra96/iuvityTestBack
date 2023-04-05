@@ -1,0 +1,39 @@
+package com.iuvity.constants;
+
+public class Constants {
+
+	// DROPS TABLE
+	public static String DROP_PRODUCTO = "DROP TABLE Producto IF EXISTS;";
+	public static String DROP_KARDEX = "DROP TABLE Kardex IF EXISTS;";
+	public static String DROP_PROVEEDOR = "DROP TABLE Proveedor IF EXISTS;";
+	public static String DROP_FACTURA_COMPRA = "DROP TABLE Factura_Compra IF EXISTS;";
+	public static String DROP_PRODUCTO_FACTURA_COMPRA = "DROP TABLE Producto_Factura_Compra IF EXISTS;";
+	public static String DROP_CLIENTE = "DROP TABLE Cliente IF EXISTS;";
+	public static String DROP_FACTURA_VENTA = "DROP TABLE Factura_Venta IF EXISTS;";
+	public static String DROP_PRODUCTO_FACTURA_VENTA = "DROP TABLE Producto_Factura_Venta IF EXISTS;";
+	public static String DROP_ADMIN = "DROP TABLE Admin IF EXISTS;";
+
+	// CREATE TABLE
+	public static String CREATE_PRODUCTO = "CREATE TABLE IF NOT EXISTS Producto (codigo IDENTITY NOT NULL PRIMARY KEY, nombre VARCHAR(100), referencia VARCHAR(100),unidad VARCHAR(100));";
+	public static String CREATE_KARDEX = " CREATE TABLE IF NOT EXISTS Kardex(indice IDENTITY NOT NULL PRIMARY KEY, codigo_producto integer,fecha varchar(100),descripcion varchar(255),vlr_unitario NUMERIC (100, 2),entrada_cant NUMERIC (100, 2),entrada_valor NUMERIC (100, 2),salida_cant NUMERIC (100, 2),salida_valor NUMERIC (100, 2),saldo_cant NUMERIC (100, 2),saldo_valor NUMERIC (100, 2),codigo_factura_venta integer,codigo_factura_compra integer,CONSTRAINT FK_codigo_producto FOREIGN KEY (codigo_producto) REFERENCES producto(codigo));";
+	public static String CREATE_PROVEEDOR = "CREATE TABLE IF NOT EXISTS Proveedor(codigo IDENTITY NOT NULL PRIMARY KEY, nit varchar(50),nombre varchar(100),direccion varchar(100),representante_legal varchar(100), UNIQUE (nit))";
+	public static String CREATE_FACTURA_COMPRA = "CREATE TABLE IF NOT EXISTS Factura_Compra(codigo IDENTITY NOT NULL PRIMARY KEY, codigo_proveedor integer,fecha varchar(100),CONSTRAINT FK_codigo_proveedor FOREIGN KEY (codigo_proveedor) REFERENCES Proveedor(codigo));";
+	public static String CREATE_PRODUCTO_FACTURA_COMPRA = "CREATE TABLE IF NOT EXISTS Producto_Factura_Compra(codigo IDENTITY NOT NULL PRIMARY KEY,codigo_producto integer,codigo_factura integer,valor_total NUMERIC (100, 2), cantidad INTEGER,CONSTRAINT FK_codigo_producto_compra FOREIGN KEY (codigo_producto) REFERENCES Producto(codigo),CONSTRAINT FK_codigo_factura_compra FOREIGN KEY (codigo_factura) REFERENCES Factura_Compra(codigo));";
+	public static String CREATE_CLIENTE = "CREATE TABLE IF NOT EXISTS Cliente(codigo IDENTITY NOT NULL PRIMARY KEY, cedula varchar(150),nombre varchar(150),usuario varchar(100),password varchar(100), UNIQUE (cedula));";
+	public static String CREATE_FACTURA_VENTA = "CREATE TABLE IF NOT EXISTS Factura_Venta(codigo IDENTITY NOT NULL PRIMARY KEY, codigo_cliente integer,fecha varchar(100),tipo_tarjeta varchar(200),numero_tarjeta varchar(300),nombre_titular varchar (150),CONSTRAINT FK_codigo_cliente FOREIGN KEY (codigo_cliente) REFERENCES Cliente(codigo));";
+	public static String CREATE_PRODUCTO_FACTURA_VENTA = "  CREATE TABLE IF NOT EXISTS Producto_Factura_Venta(codigo IDENTITY NOT NULL PRIMARY KEY, codigo_producto integer,codigo_factura integer,valor_total NUMERIC (100, 2), cantidad INTEGER,CONSTRAINT FK_codigo_producto_venta FOREIGN KEY (codigo_producto) REFERENCES Producto(codigo),CONSTRAINT FK_codigo_factura_venta FOREIGN KEY (codigo_factura) REFERENCES Factura_Venta(codigo));";
+	public static String CREATE_ADMIN = "CREATE TABLE IF NOT EXISTS Admin(cedula IDENTITY NOT NULL PRIMARY KEY,nombre varchar(150),usuario varchar(50),password varchar(100));";
+
+	// INSERT
+	public static String INSERT_ADMIN = "INSERT INTO Admin (cedula,nombre,usuario,password) values('1053852663','David Piedrahita','davipigi','UlRSQlFXMUlORWt6YVdnMFdWWmpiVFptYVZaQ1VUMDk_');";
+	public static String INSERT_CLIENTE = "INSERT INTO Cliente (cedula,nombre,usuario,password) values('1053852663','David','juli','UlRSQlFXMUlORWt6YVdnMFdWWmpiVFptYVZaQ1VUMDk_');";
+	public static String INSERT_PROVEEDOR = "INSERT INTO PROVEEDOR (NIT,NOMBRE,DIRECCION,REPRESENTANTE_LEGAL) VALUES ('1','DAVID','DIRECCION','REPRESENTANTE');";
+
+	// ERROR
+	public static String DATOS_INGRESADOS_ERRONEOS = "Datos recibidos incorrectos, no se permiten valores null, vacios o negativos";
+
+	// SECURITY
+	public static final String SECRETKEYAES = "&!vtBGYm#0Qs#YxH!cwIF9D3dmvxZSmn";
+	public static final String SALTAES = "testtodo1";
+
+}

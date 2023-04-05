@@ -1,0 +1,6 @@
+package com.iuvity.dao;
+
+@Service
+public interface IAdminDAO {
+
+}

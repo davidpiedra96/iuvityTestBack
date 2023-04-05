@@ -1,0 +1,14 @@
+package com.iuvity.dao;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+
+import com.iuvity.domain.Producto;
+
+public interface IProductoDAO extends CrudRepository<Producto, Integer> {
+	@Query(value = "SELECT P.* FROM PRODUCTO P, (SELECT * FROM KARDEX ORDER BY INDICE DESC LIMIT 1) K WHERE P.codigo = K.codigo_producto AND k.saldo_cant > 0;", nativeQuery = true)
+	List<Producto> findAllProductoStock();
+
+}

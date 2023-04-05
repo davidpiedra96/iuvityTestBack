@@ -1,0 +1,9 @@
+package com.iuvity.service;
+
+import java.util.List;
+
+import com.iuvity.domain.Producto;
+
+public interface IProductoService {
+	public List<RequestListarProductos> listarProductos();
+}

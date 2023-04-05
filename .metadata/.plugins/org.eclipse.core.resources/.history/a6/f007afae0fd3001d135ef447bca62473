@@ -1,0 +1,20 @@
+package com.iuvity.dao;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+
+import com.iuvity.domain.Producto;
+import com.iuvity.domain.ResponseListarProductos;
+
+public interface IProductoDAO extends CrudRepository<Producto, Integer> {
+	@Query(value = "SELECT  P.CODIGO,P.NOMBRE, P.REFERENCIA, P.UNIDAD, K.SALDO_CANT, K.VLR_UNITARIO"
+			+ " FROM KARDEX K, (SELECT P.CODIGO_PRODUCTO, MAX(PARSEDATETIME(P.FECHA,'dd/MM/yyyy','en')) AS FECHA"
+			+ " FROM KARDEX P"
+			+ " GROUP BY  P.CODIGO_PRODUCTO) X,"
+			+ " PRODUCTO P"
+			+ " WHERE K.CODIGO_PRODUCTO = X.CODIGO_PRODUCTO AND  PARSEDATETIME(k.FECHA,'dd/MM/yyyy','en') =  X.FECHA AND P.CODIGO = K.CODIGO_PRODUCTO", nativeQuery = true)
+	List<ResponseListarProductos> findAllProductoStock();
+
+}

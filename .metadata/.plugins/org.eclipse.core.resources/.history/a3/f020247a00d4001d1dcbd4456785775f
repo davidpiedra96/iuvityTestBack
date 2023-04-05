@@ -1,0 +1,16 @@
+package com.iuvity.service;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+@DataJpaTest
+class ProveedorServiceTest {
+
+	@Test
+	void testObtenerProveedorPorNit() {
+		fail("Not yet implemented");
+	}
+
+}

@@ -1,0 +1,12 @@
+1680468904895	Rename type 'Admin'
+1680469088230	Rename package 'com.iuvity.constant'
+1680492620147	Rename local variable 'signUpRequest'
+1680590603607	Rename type 'ConsultarKardexProductoRequest'
+1680626390991	Delete element
+1680627358413	Rename type 'RequestListarProductos'
+1680627393989	Delete element
+1680630023655	Rename method 'findAllProductoStock'
+1680716219976	Rename type 'SignupRequest'
+1680723666936	Delete elements
+1680731149685	Delete element
+1680735162143	Move compilation units

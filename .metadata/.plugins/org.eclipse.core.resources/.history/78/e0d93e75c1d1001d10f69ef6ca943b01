@@ -1,0 +1,184 @@
+package com.iuvity.util;
+
+import java.nio.charset.StandardCharsets;
+import java.security.spec.KeySpec;
+import java.util.Base64;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.iuvity.constants.Constants;
+import com.iuvity.domain.RequestCreacionUsuario;
+import com.iuvity.domain.RequestCreacionStock;
+import com.iuvity.domain.RequestDevolucionCompraProducto;
+import com.iuvity.domain.RequestDevolucionVentaProducto;
+import com.iuvity.domain.RequestIngresoProducto;
+import com.iuvity.domain.RequestVentaProducto;
+
+public class Util {
+
+	public boolean validarRequestCreacionUsuario(RequestCreacionUsuario rcc) {
+		if (esNullOrVacio(rcc.getNombre()) || esNullOrVacio(rcc.getUsuario()) || esNullOrVacio(rcc.getPassword())
+				|| esNullOrVacio(rcc.getCedula())) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean validarRequestCreacionStock(RequestCreacionStock rcs) {
+		if (esNullOrVacio(rcs.getNombre()) || esNullOrVacio(rcs.getReferencia()) || esNullOrVacio(rcs.getUnidad())
+				|| esNullOrVacio(rcs.getFecha_factura()) || esNullOrVacio(rcs.getDescripcion())
+				|| esMenorACeroONull(rcs.getCodigo_proveedor()) || esMenorACeroONull(rcs.getCantidad())
+				|| esMenorACeroONull(rcs.getValor_total())) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean validarRequestDevolucionCompraProducto(RequestDevolucionCompraProducto rdcp) {
+		if (esNullOrVacio(rdcp.getFecha()) || esNullOrVacio(rdcp.getDescripcion())
+				|| esMenorACeroONull(rdcp.getCodigo_producto()) || esMenorACeroONull(rdcp.getEntrada_cant())
+				|| esMenorACeroONull(rdcp.getValor_compra()) || esMenorACeroONull(rdcp.getCodigo_factura_compra())) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean validarRequestDevolucionVentaProducto(RequestDevolucionVentaProducto rdvp) {
+		if (esNullOrVacio(rdvp.getFecha()) || esNullOrVacio(rdvp.getDescripcion())
+				|| esMenorACeroONull(rdvp.getCodigo_producto()) || esMenorACeroONull(rdvp.getSalida_cant())
+				|| esMenorACeroONull(rdvp.getCodigo_factura_venta())) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean validarRequestIngresoProducto(RequestIngresoProducto rip) {
+		if (esNullOrVacio(rip.getFecha()) || esNullOrVacio(rip.getDescripcion())
+				|| esMenorACeroONull(rip.getCodigo_producto()) || esMenorACeroONull(rip.getEntrada_cant())
+				|| esMenorACeroONull(rip.getEntrada_valor()) || esMenorACeroONull(rip.getCodigo_proveedor())) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean validarRequestVentaProducto(RequestVentaProducto rvp) {
+		if (esNullOrVacio(rvp.getFecha()) || esNullOrVacio(rvp.getDescripcion()) || esNullOrVacio(rvp.getTipo_tarjeta())
+				|| esNullOrVacio(rvp.getNumero_tarjeta()) || esNullOrVacio(rvp.getNombre_titular())
+				|| esMenorACeroONull(rvp.getCodigo_producto()) || esMenorACeroONull(rvp.getSalida_cant())
+				|| esMenorACeroONull(rvp.getCodigo_cliente())) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean esNullOrVacio(String valor) {
+		boolean resp = false;
+		if (valor.isEmpty() || valor.equals("") || valor == null) {
+			resp = true;
+		}
+		return resp;
+	}
+
+	public boolean esMenorACeroONull(Object valor) {
+		boolean resp = false;
+		if (valor instanceof Float) {
+			if ((Float) valor < 0 || valor == null) {
+				resp = true;
+			}
+		} else if (valor instanceof Integer) {
+			if ((Integer) valor < 0 || valor == null) {
+				resp = true;
+			}
+		}
+
+		
+
+		return resp;
+	}
+
+	/**
+	 * Método para encriptar un texto en AES
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public String getAES(String data) {
+
+		try {
+			byte[] iv = new byte[16];
+			IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+			SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+			KeySpec keySpec = new PBEKeySpec(Constants.SECRETKEYAES.toCharArray(), Constants.SALTAES.getBytes(), 65536,
+					256);
+			SecretKey secretKeyTemp = secretKeyFactory.generateSecret(keySpec);
+			SecretKeySpec secretKey = new SecretKeySpec(secretKeyTemp.getEncoded(), "AES");
+			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
+			String AES = Base64.getEncoder().encodeToString(cipher.doFinal(data.getBytes("UTF-8")));
+			String AESinBase64 = cifrarBase64(AES);
+			return AESinBase64;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * Texto para desencriptar texto en AES
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public String getAESDecrypt(String data) {
+		byte[] iv = new byte[16];
+		try {
+			String AES = descifrarBase64(data);
+			IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+			SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+			KeySpec keySpec = new PBEKeySpec(Constants.SECRETKEYAES.toCharArray(), Constants.SALTAES.getBytes(), 65536,
+					256);
+			SecretKey secretKeyTemp = secretKeyFactory.generateSecret(keySpec);
+			SecretKeySpec secretKey = new SecretKeySpec(secretKeyTemp.getEncoded(), "AES");
+			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+			cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParameterSpec);
+			return new String(cipher.doFinal(Base64.getDecoder().decode(AES)));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * Método para codificar en Base64
+	 * 
+	 * @param a
+	 * @return
+	 */
+	public String cifrarBase64(String a) {
+		Base64.Encoder encoder = Base64.getEncoder();
+		String b = encoder.encodeToString(a.getBytes(StandardCharsets.UTF_8));
+		return b.replace("=", "_");
+	}
+
+	/**
+	 * Método para decodificar en Base64
+	 * 
+	 * @param a
+	 * @return
+	 */
+	public String descifrarBase64(String a) {
+		a = a.replace("_", "=");
+		Base64.Decoder decoder = Base64.getDecoder();
+		byte[] decodedByteArray = decoder.decode(a);
+		String b = new String(decodedByteArray);
+		return b;
+	}
+}

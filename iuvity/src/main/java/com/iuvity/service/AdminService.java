@@ -1,0 +1,46 @@
+package com.iuvity.service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.iuvity.dao.IAdminDAO;
+import com.iuvity.domain.Admin;
+import com.iuvity.payload.JwtResponse;
+import com.iuvity.payload.LoginRequest;
+import com.iuvity.payload.MessageResponse;
+import com.iuvity.payload.RequestRegistrar;
+import com.iuvity.security.jwt.JwtUtils;
+import com.iuvity.security.service.UserDetailsImpl;
+
+@Service
+public class AdminService implements IAdminService {
+
+	@Autowired
+	private IAdminDAO dao;
+	
+	
+	@Override
+	public Admin consultarAdminPorUsuario(String usuario) {
+		return dao.findByUsuario(usuario);
+	}
+
+	@Override
+	public Admin consultarAdminPorCedulaYUsuario(Integer cedula, String usuario) {
+		return dao.findByCedulaAndUsuario(cedula, usuario);
+	}
+
+	@Override
+	public Admin guardarAdmin(Admin admin) {
+		return dao.save(admin);
+	}
+
+}

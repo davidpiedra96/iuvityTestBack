@@ -1,0 +1,28 @@
+package com.iuvity.service;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+class LoginServiceTest {
+	
+	@Autowired
+	IAdminService ias;
+
+	@Test
+	void testLogin() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testRegistrarUsuario() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testValidarToken() {
+		fail("Not yet implemented");
+	}
+
+}

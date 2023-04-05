@@ -1,0 +1,19 @@
+package com.iuvity.service;
+
+import org.springframework.http.ResponseEntity;
+
+import com.iuvity.domain.Admin;
+import com.iuvity.payload.LoginRequest;
+import com.iuvity.payload.RequestRegistrar;
+
+public interface IAdminService {
+
+	/**
+	 * Método que consulta los datos del administrador por medio de su usuario
+	 * @param usuario
+	 * @return
+	 */
+	Admin consultarAdminPorUsuario(String usuario);
+	Admin consultarAdminPorCedulaYUsuario(Integer cedula, String usuario);
+	Admin guardarAdmin(Admin admin);
+}

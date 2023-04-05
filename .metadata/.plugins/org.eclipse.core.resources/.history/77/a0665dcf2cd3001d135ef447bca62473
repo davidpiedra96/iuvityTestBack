@@ -1,0 +1,120 @@
+package com.iuvity.security.service;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.iuvity.domain.AdminConfiguration;
+import com.iuvity.domain.ERol;
+import com.iuvity.domain.Rol;
+
+public class UserDetailsImpl implements UserDetails {
+
+	private static final long serialVersionUID = 1L;
+
+	private String nombre;
+	private String nombre;
+	private String usuario;
+
+	@JsonIgnore
+	private String password;
+
+	private Collection<? extends GrantedAuthority> authorities;
+
+	public UserDetailsImpl(String nombre,String usuario, String password, Collection<? extends GrantedAuthority> authorities) {
+		this.cedula = cedula;
+		this.usuario = usuario;
+		this.password = password;
+		this.authorities = authorities;
+	}
+
+	public static UserDetailsImpl build(AdminConfiguration admin) {
+
+//		List<GrantedAuthority> authorities = admin.getRoles().stream()
+//				.map(role -> new SimpleGrantedAuthority(role.getNombre().name())).collect(Collectors.toList());
+
+		List<Rol> lroles = new ArrayList<>();
+		lroles.add(new Rol(1, ERol.ROLE_ADMIN));
+		List<GrantedAuthority> authorities = lroles.stream()
+				.map(rol -> new SimpleGrantedAuthority(rol.getNombre().name())).collect(Collectors.toList());
+
+		return new UserDetailsImpl(admin.getNombre(),admin.getUsuario(), admin.getPassword(), authorities);
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return authorities;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+//	@Override
+//	public boolean equals(Object o) {
+//		if (this == o)
+//			return true;
+//		if (o == null || getClass() != o.getClass())
+//			return false;
+//		UserDetailsImpl user = (UserDetailsImpl) o;
+//		return Objects.equals(cedula, user.getCedula());
+//	}
+
+	@Override
+	public String getPassword() {
+		return password;
+	}
+
+	@Override
+	public String getUsername() {
+		// TODO Auto-generated method stub
+		return usuario;
+	}
+
+	public synchronized String getNombre() {
+		return nombre;
+	}
+
+	public synchronized void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public synchronized String getUsuario() {
+		return usuario;
+	}
+
+	public synchronized void setUsuario(String usuario) {
+		this.usuario = usuario;
+	}
+
+	public synchronized void setPassword(String password) {
+		this.password = password;
+	}
+}

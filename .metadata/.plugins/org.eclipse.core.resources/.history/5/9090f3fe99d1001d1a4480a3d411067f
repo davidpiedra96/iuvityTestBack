@@ -1,0 +1,21 @@
+package com.iuvity.security.service;
+
+public class UserDetailsImpl implements UserDetails {
+
+	private static final long serialVersionUID = 1L;
+
+	private Integer cedula;
+	private String nombre;
+	private String usuario;
+
+	@JsonIgnore
+	private String password;
+
+	private Collection<? extends GrantedAuthority> authorities;
+
+	public UserDetailsImpl(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+		this.usuario = username;
+		this.password = password;
+		this.authorities = authorities;
+	}
+}

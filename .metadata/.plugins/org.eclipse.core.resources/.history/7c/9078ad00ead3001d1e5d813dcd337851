@@ -1,0 +1,24 @@
+package com.iuvity.service;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+class AdminServiceTest {
+
+	@Test
+	void testConsultarAdminPorUsuario() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testConsultarAdminPorCedulaYUsuario() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testGuardarAdmin() {
+		fail("Not yet implemented");
+	}
+
+}

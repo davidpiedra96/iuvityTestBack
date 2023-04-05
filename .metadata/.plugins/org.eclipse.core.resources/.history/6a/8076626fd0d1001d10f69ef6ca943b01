@@ -1,0 +1,25 @@
+package com.iuvity.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.iuvity.dao.IAdminDAO;
+import com.iuvity.domain.Admin;
+
+@Service
+public class AdminService implements IAdminService {
+
+	@Autowired
+	private IAdminDAO dao;
+	
+	@Override
+	public Admin consultarAdminPorUsuario(String usuario) {
+		return dao.findByUsuario(usuario);
+	}
+
+	@Override
+	public Admin consultarAdminPorCedulaYUsuario(Integer cedula, String usuario) {
+		return dao.findByCedulaAndUsuario(cedula, usuario);
+	}
+
+}
